@@ -1,0 +1,6 @@
+planner.exe
+planner-asan.exe
+*.o
+web/node_modules/
+web/dist/
+data/orders_sorted.json

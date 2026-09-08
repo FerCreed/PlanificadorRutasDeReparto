@@ -1,0 +1,112 @@
+{
+  "orders": [
+    {
+      "id_pedido": 1,
+      "nodo_destino": 181333557,
+      "peso_paquete": 2.0,
+      "prioridad": 5,
+      "ventana_inicio": 480,
+      "ventana_fin": 660,
+      "distancia_al_almacen": 205.55
+    },
+    {
+      "id_pedido": 2,
+      "nodo_destino": 181335583,
+      "peso_paquete": 1.5,
+      "prioridad": 3,
+      "ventana_inicio": 540,
+      "ventana_fin": 720,
+      "distancia_al_almacen": 211.17
+    },
+    {
+      "id_pedido": 3,
+      "nodo_destino": 181335601,
+      "peso_paquete": 3.0,
+      "prioridad": 5,
+      "ventana_inicio": -1,
+      "ventana_fin": -1,
+      "distancia_al_almacen": 896.67
+    },
+    {
+      "id_pedido": 4,
+      "nodo_destino": 363965501,
+      "peso_paquete": 0.8,
+      "prioridad": 2,
+      "ventana_inicio": 840,
+      "ventana_fin": 960,
+      "distancia_al_almacen": 195.45
+    },
+    {
+      "id_pedido": 5,
+      "nodo_destino": 651926225,
+      "peso_paquete": 1.2,
+      "prioridad": 4,
+      "ventana_inicio": 600,
+      "ventana_fin": 660,
+      "distancia_al_almacen": 422.45
+    },
+    {
+      "id_pedido": 6,
+      "nodo_destino": 1585117848,
+      "peso_paquete": 2.5,
+      "prioridad": 1,
+      "ventana_inicio": -1,
+      "ventana_fin": -1,
+      "distancia_al_almacen": 357.29
+    },
+    {
+      "id_pedido": 7,
+      "nodo_destino": 5079073017,
+      "peso_paquete": 1.0,
+      "prioridad": 4,
+      "ventana_inicio": 480,
+      "ventana_fin": 570,
+      "distancia_al_almacen": 169.2
+    },
+    {
+      "id_pedido": 8,
+      "nodo_destino": 5079073018,
+      "peso_paquete": 4.0,
+      "prioridad": 3,
+      "ventana_inicio": 780,
+      "ventana_fin": 900,
+      "distancia_al_almacen": 62.42
+    },
+    {
+      "id_pedido": 9,
+      "nodo_destino": 5079073222,
+      "peso_paquete": 0.5,
+      "prioridad": 5,
+      "ventana_inicio": 720,
+      "ventana_fin": 780,
+      "distancia_al_almacen": 16.87
+    },
+    {
+      "id_pedido": 10,
+      "nodo_destino": 5079073225,
+      "peso_paquete": 2.2,
+      "prioridad": 2,
+      "ventana_inicio": -1,
+      "ventana_fin": -1,
+      "distancia_al_almacen": 57.84
+    },
+    {
+      "id_pedido": 11,
+      "nodo_destino": 5079073226,
+      "peso_paquete": 1.8,
+      "prioridad": 4,
+      "ventana_inicio": 960,
+      "ventana_fin": 1080,
+      "distancia_al_almacen": 63.79
+    },
+    {
+      "id_pedido": 12,
+      "nodo_destino": 5079073227,
+      "peso_paquete": 3.5,
+      "prioridad": 1,
+      "ventana_inicio": 420,
+      "ventana_fin": 1200,
+      "distancia_al_almacen": 83.87
+    }
+  ]
+}
