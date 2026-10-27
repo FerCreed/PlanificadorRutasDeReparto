@@ -1,0 +1,18 @@
+{
+  "algorithm": "backtracking",
+  "exact": true,
+  "nodos_explorados": 34967,
+  "distancia_total_m": 2360.33,
+  "paradas": [
+    { "orden": 1, "id_pedido": 9, "nodo_destino": 5079073222 },
+    { "orden": 2, "id_pedido": 11, "nodo_destino": 5079073226 },
+    { "orden": 3, "id_pedido": 8, "nodo_destino": 5079073018 },
+    { "orden": 4, "id_pedido": 5, "nodo_destino": 651926225 },
+    { "orden": 5, "id_pedido": 7, "nodo_destino": 5079073017 },
+    { "orden": 6, "id_pedido": 2, "nodo_destino": 181335583 },
+    { "orden": 7, "id_pedido": 1, "nodo_destino": 181333557 },
+    { "orden": 8, "id_pedido": 3, "nodo_destino": 181335601 }
+  ],
+  "nodos": [5079073224, 5079073222, 5079073224, 5079073249, 5079073225, 5869371753, 5079073226, 5869371753, 5079073225, 5079073018, 5079073227, 5079073242, 5079073017, 651926225, 5079073017, 363965501, 181335583, 5394883842, 181333557, 7266805518, 7266805517, 181335601],
+  "inalcanzables": []
+}

@@ -35,6 +35,60 @@ header p {
   font-size: 0.9rem;
 }
 
+.tabs {
+  display: flex;
+  gap: 8px;
+  padding: 8px 20px;
+  background: #1e293b;
+}
+
+.tab {
+  background: #334155;
+}
+
+.tab.activa {
+  background: #2563eb;
+}
+
+.toolbar {
+  padding: 8px 20px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.barras {
+  margin-top: 12px;
+}
+
+.barra-grupo {
+  margin-bottom: 10px;
+}
+
+.barra-n {
+  display: inline-block;
+  width: 4.5rem;
+  font-size: 0.85rem;
+}
+
+.barra {
+  height: 8px;
+  margin: 3px 0 3px 4.5rem;
+  border-radius: 4px;
+  min-width: 2px;
+}
+
+.barra.merge {
+  background: #2563eb;
+}
+
+.barra.ins {
+  background: #d97706;
+}
+
+.barra.bur {
+  background: #dc2626;
+}
+
 .map {
   height: min(62vh, 640px);
   width: 100%;

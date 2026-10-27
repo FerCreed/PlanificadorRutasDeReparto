@@ -1,0 +1,91 @@
+{
+  "algorithm": "dijkstra",
+  "exact": true,
+  "origen": 5079073224,
+  "rutas": [
+    {
+      "id_pedido": 1,
+      "nodo_destino": 181333557,
+      "alcanzable": true,
+      "distancia_m": 233.47,
+      "nodos": [5079073224, 5079073249, 5862441546, 5862441549, 363965501, 181333557]
+    },
+    {
+      "id_pedido": 2,
+      "nodo_destino": 181335583,
+      "alcanzable": true,
+      "distancia_m": 229.16,
+      "nodos": [5079073224, 5079073249, 5862441546, 5862441549, 363965501, 181335583]
+    },
+    {
+      "id_pedido": 3,
+      "nodo_destino": 181335601,
+      "alcanzable": true,
+      "distancia_m": 981.56,
+      "nodos": [5079073224, 5079073222, 5862441555, 7248246044, 7248246049, 7266805517, 181335601]
+    },
+    {
+      "id_pedido": 4,
+      "nodo_destino": 363965501,
+      "alcanzable": true,
+      "distancia_m": 213.20,
+      "nodos": [5079073224, 5079073249, 5862441546, 5862441549, 363965501]
+    },
+    {
+      "id_pedido": 5,
+      "nodo_destino": 651926225,
+      "alcanzable": true,
+      "distancia_m": 571.52,
+      "nodos": [5079073224, 5079073249, 5862441546, 5079073018, 5079073227, 5079073242, 5079073017, 651926225]
+    },
+    {
+      "id_pedido": 6,
+      "nodo_destino": 1585117848,
+      "alcanzable": true,
+      "distancia_m": 376.62,
+      "nodos": [5079073224, 5079073249, 5862441546, 5862441549, 363965501, 181335583, 8797694606, 1585117848]
+    },
+    {
+      "id_pedido": 7,
+      "nodo_destino": 5079073017,
+      "alcanzable": true,
+      "distancia_m": 185.86,
+      "nodos": [5079073224, 5079073249, 5862441546, 5079073018, 5079073227, 5079073242, 5079073017]
+    },
+    {
+      "id_pedido": 8,
+      "nodo_destino": 5079073018,
+      "alcanzable": true,
+      "distancia_m": 78.85,
+      "nodos": [5079073224, 5079073249, 5862441546, 5079073018]
+    },
+    {
+      "id_pedido": 9,
+      "nodo_destino": 5079073222,
+      "alcanzable": true,
+      "distancia_m": 17.64,
+      "nodos": [5079073224, 5079073222]
+    },
+    {
+      "id_pedido": 10,
+      "nodo_destino": 5079073225,
+      "alcanzable": true,
+      "distancia_m": 57.84,
+      "nodos": [5079073224, 5079073249, 5079073225]
+    },
+    {
+      "id_pedido": 11,
+      "nodo_destino": 5079073226,
+      "alcanzable": true,
+      "distancia_m": 84.97,
+      "nodos": [5079073224, 5079073249, 5079073225, 5869371753, 5079073226]
+    },
+    {
+      "id_pedido": 12,
+      "nodo_destino": 5079073227,
+      "alcanzable": true,
+      "distancia_m": 100.53,
+      "nodos": [5079073224, 5079073249, 5862441546, 5079073018, 5079073227]
+    }
+  ]
+}

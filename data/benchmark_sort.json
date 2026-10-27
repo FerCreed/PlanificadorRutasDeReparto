@@ -1,0 +1,12 @@
+{
+  "algorithm": "benchmark_sort",
+  "exact": true,
+  "comparador": "prioridad",
+  "filas": [
+    { "n": 10, "repeticiones": 80000, "mergesort_ms": 0.000163, "insercion_ms": 0.000050, "burbuja_ms": 0.000078 },
+    { "n": 50, "repeticiones": 20000, "mergesort_ms": 0.000965, "insercion_ms": 0.000552, "burbuja_ms": 0.001561 },
+    { "n": 100, "repeticiones": 6000, "mergesort_ms": 0.002097, "insercion_ms": 0.002715, "burbuja_ms": 0.008227 },
+    { "n": 200, "repeticiones": 1500, "mergesort_ms": 0.004724, "insercion_ms": 0.009982, "burbuja_ms": 0.032317 },
+    { "n": 400, "repeticiones": 400, "mergesort_ms": 0.010318, "insercion_ms": 0.040142, "burbuja_ms": 0.128958 }
+  ]
+}

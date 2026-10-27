@@ -8,7 +8,11 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "sync-data": "node scripts/sync-data.mjs",
-    "sort": "node scripts/sort.mjs"
+    "sort": "node scripts/run-c.mjs sort",
+    "bench": "node scripts/run-c.mjs bench",
+    "rutas": "node scripts/run-c.mjs rutas",
+    "prim": "node scripts/run-c.mjs prim",
+    "secuencia": "node scripts/run-c.mjs secuencia"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
