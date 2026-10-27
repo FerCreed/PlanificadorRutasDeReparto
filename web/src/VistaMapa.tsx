@@ -1,6 +1,6 @@
-import { CircleMarker, MapContainer, Polyline, Popup, TileLayer } from "react-leaflet";
+import { CircleMarker, MapContainer, Polyline, Popup, TileLayer, ZoomControl } from "react-leaflet";
 import type { LatLngExpression } from "leaflet";
-import type { CapaMapa, MapaZona, Pedido, RedMinima, RutaDijkstra, Secuencia } from "./types";
+import type { CapasVisibles, MapaZona, Pedido, RedMinima, RutaDijkstra, Secuencia } from "./types";
 
 function indiceNodos(mapa: MapaZona): Map<number, { lat: number; lon: number }> {
   return new Map(mapa.nodes.map((nodo) => [nodo.id, { lat: nodo.lat, lon: nodo.lon }]));
@@ -35,13 +35,13 @@ function formatearVentana(inicio: number | null, fin: number | null): string {
 type Propiedades = {
   mapa: MapaZona;
   pedidos: Pedido[];
-  capa: CapaMapa;
+  capas: CapasVisibles;
   rutaDijkstra: RutaDijkstra | null;
   redMinima: RedMinima | null;
   secuencia: Secuencia | null;
 };
 
-export function VistaMapa({ mapa, pedidos, capa, rutaDijkstra, redMinima, secuencia }: Propiedades) {
+export function VistaMapa({ mapa, pedidos, capas, rutaDijkstra, redMinima, secuencia }: Propiedades) {
   const porId = indiceNodos(mapa);
   const latitudes = mapa.nodes.map((nodo) => nodo.lat);
   const longitudes = mapa.nodes.map((nodo) => nodo.lon);
@@ -75,30 +75,32 @@ export function VistaMapa({ mapa, pedidos, capa, rutaDijkstra, redMinima, secuen
     pedidosPorNodo.set(pedido.nodo_destino, lista);
   }
 
-  const tenues = capa !== "grafo";
+  const hayCapaAlgoritmo = capas.dijkstra || capas.prim || capas.gira;
   const ptsDijkstra = rutaDijkstra ? coordenadasDeIds(rutaDijkstra.nodos, porId) : [];
   const ptsGira = secuencia ? coordenadasDeIds(secuencia.nodos, porId) : [];
 
   return (
-    <MapContainer center={centro} zoom={16} className="map">
+    <MapContainer center={centro} zoom={16} className="map" zoomControl={false}>
+      <ZoomControl position="topright" />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {polilineasGrafo.map((linea) => (
-        <Polyline
-          key={linea.clave}
-          positions={linea.posiciones}
-          pathOptions={{
-            color: "#2563eb",
-            weight: tenues ? 2 : 4,
-            opacity: tenues ? 0.28 : 0.75,
-          }}
-        >
-          <Popup>{linea.peso.toFixed(1)} m</Popup>
-        </Polyline>
-      ))}
-      {capa === "prim" &&
+      {capas.grafo &&
+        polilineasGrafo.map((linea) => (
+          <Polyline
+            key={linea.clave}
+            positions={linea.posiciones}
+            pathOptions={{
+              color: "#3b82f6",
+              weight: hayCapaAlgoritmo ? 2 : 4,
+              opacity: hayCapaAlgoritmo ? 0.3 : 0.75,
+            }}
+          >
+            <Popup>{linea.peso.toFixed(1)} m</Popup>
+          </Polyline>
+        ))}
+      {capas.prim &&
         redMinima?.aristas.map((arista) => {
           const a = porId.get(arista.from);
           const b = porId.get(arista.to);
@@ -112,16 +114,16 @@ export function VistaMapa({ mapa, pedidos, capa, rutaDijkstra, redMinima, secuen
                 [a.lat, a.lon],
                 [b.lat, b.lon],
               ]}
-              pathOptions={{ color: "#15803d", weight: 5, opacity: 0.9 }}
+              pathOptions={{ color: "#16a34a", weight: 5, opacity: 0.92 }}
             >
               <Popup>MST {arista.weight.toFixed(1)} m</Popup>
             </Polyline>
           );
         })}
-      {capa === "dijkstra" && ptsDijkstra.length >= 2 ? (
-        <Polyline positions={ptsDijkstra} pathOptions={{ color: "#c2410c", weight: 6, opacity: 0.95 }} />
+      {capas.dijkstra && ptsDijkstra.length >= 2 ? (
+        <Polyline positions={ptsDijkstra} pathOptions={{ color: "#ea580c", weight: 6, opacity: 0.95 }} />
       ) : null}
-      {capa === "gira" && ptsGira.length >= 2 ? (
+      {capas.gira && ptsGira.length >= 2 ? (
         <Polyline positions={ptsGira} pathOptions={{ color: "#7c3aed", weight: 6, opacity: 0.95 }} />
       ) : null}
       {mapa.nodes.map((nodo) => {
@@ -130,49 +132,46 @@ export function VistaMapa({ mapa, pedidos, capa, rutaDijkstra, redMinima, secuen
           <CircleMarker
             key={nodo.id}
             center={[nodo.lat, nodo.lon]}
-            radius={esAlmacen ? 11 : 5}
+            radius={esAlmacen ? 11 : 4}
             pathOptions={{
-              color: esAlmacen ? "#b45309" : "#0f172a",
-              fillColor: esAlmacen ? "#f59e0b" : "#e2e8f0",
+              color: esAlmacen ? "#b45309" : "#334155",
+              fillColor: esAlmacen ? "#f59e0b" : "#f8fafc",
               fillOpacity: 1,
               weight: 2,
             }}
           >
             <Popup>
               {esAlmacen ? "Almacén" : "Intersección"} #{nodo.id}
-              <br />
-              {nodo.lat.toFixed(6)}, {nodo.lon.toFixed(6)}
             </Popup>
           </CircleMarker>
         );
       })}
-      {pedidos.map((pedido) => {
-        const posicion = porId.get(pedido.nodo_destino);
-        if (!posicion) {
-          return null;
-        }
-        const pila = pedidosPorNodo.get(pedido.nodo_destino) ?? [pedido];
-        const indice = pila.findIndex((x) => x.id_pedido === pedido.id_pedido);
-        const desplazamiento = indice * 0.00004;
-        return (
-          <CircleMarker
-            key={`pedido-${pedido.id_pedido}`}
-            center={[posicion.lat + desplazamiento, posicion.lon + desplazamiento]}
-            radius={8}
-            pathOptions={{ color: "#9f1239", fillColor: "#f43f5e", fillOpacity: 0.95, weight: 2 }}
-          >
-            <Popup>
-              Pedido {pedido.id_pedido}
-              <br />
-              Prioridad {pedido.prioridad} · {pedido.peso_paquete} kg
-              <br />
-              {formatearVentana(pedido.ventana_inicio, pedido.ventana_fin)}
-              <br />
-              Dist. almacén: {pedido.distancia_al_almacen.toFixed(1)} m
-            </Popup>
-          </CircleMarker>
-        );
-      })}
+      {capas.pedidos &&
+        pedidos.map((pedido) => {
+          const posicion = porId.get(pedido.nodo_destino);
+          if (!posicion) {
+            return null;
+          }
+          const pila = pedidosPorNodo.get(pedido.nodo_destino) ?? [pedido];
+          const indice = pila.findIndex((x) => x.id_pedido === pedido.id_pedido);
+          const desplazamiento = indice * 0.00004;
+          return (
+            <CircleMarker
+              key={`pedido-${pedido.id_pedido}`}
+              center={[posicion.lat + desplazamiento, posicion.lon + desplazamiento]}
+              radius={8}
+              pathOptions={{ color: "#9f1239", fillColor: "#f43f5e", fillOpacity: 0.95, weight: 2 }}
+            >
+              <Popup>
+                Pedido {pedido.id_pedido}
+                <br />
+                Prioridad {pedido.prioridad} · {pedido.peso_paquete} kg
+                <br />
+                {formatearVentana(pedido.ventana_inicio, pedido.ventana_fin)}
+              </Popup>
+            </CircleMarker>
+          );
+        })}
     </MapContainer>
   );
 }

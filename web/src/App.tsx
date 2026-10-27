@@ -3,8 +3,9 @@ import { VistaMapa } from "./VistaMapa";
 import { TablaPedidos } from "./TablaPedidos";
 import { TablaBenchmark } from "./TablaBenchmark";
 import type {
+  AlgoritmoFoco,
   BenchmarkSort,
-  CapaMapa,
+  CapasVisibles,
   MapaZona,
   Pedido,
   PedidosOrdenados,
@@ -29,14 +30,29 @@ async function intentarJson<T>(url: string): Promise<T | null> {
   }
 }
 
+const titulos: Record<AlgoritmoFoco, string> = {
+  grafo: "Mapa de la zona (lista de adyacencia)",
+  dijkstra: "Ruta más corta almacén → pedido (Dijkstra)",
+  prim: "Red mínima de calles (Prim)",
+  gira: "Secuencia de entregas (backtracking)",
+};
+
 export default function App() {
+  const [vista, setVista] = useState<"mapa" | "benchmark">("mapa");
   const [mapa, setMapa] = useState<MapaZona | null>(null);
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [rutas, setRutas] = useState<RutasDijkstra | null>(null);
   const [mst, setMst] = useState<RedMinima | null>(null);
   const [secuencia, setSecuencia] = useState<Secuencia | null>(null);
   const [bench, setBench] = useState<BenchmarkSort | null>(null);
-  const [capa, setCapa] = useState<CapaMapa>("grafo");
+  const [foco, setFoco] = useState<AlgoritmoFoco>("grafo");
+  const [capas, setCapas] = useState<CapasVisibles>({
+    grafo: true,
+    pedidos: true,
+    dijkstra: false,
+    prim: false,
+    gira: false,
+  });
   const [idPedidoRuta, setIdPedidoRuta] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -81,94 +97,193 @@ export default function App() {
     return rutas.rutas.find((r) => r.id_pedido === idPedidoRuta) ?? null;
   }, [rutas, idPedidoRuta]);
 
+  const enfocar = (id: AlgoritmoFoco) => {
+    setFoco(id);
+  };
+
+  const toggleCapa = (clave: keyof CapasVisibles) => {
+    setCapas((prev) => ({ ...prev, [clave]: !prev[clave] }));
+  };
+
   return (
-    <div className="layout">
-      <header>
-        <h1>Planificador de rutas — U1 a U4</h1>
-        <p>Grafo OSM (UABC Otay) · MergeSort · Dijkstra · Prim · backtracking</p>
-      </header>
-      <nav className="tabs">
-        {(
-          [
-            ["grafo", "Grafo"],
-            ["dijkstra", "Rutas Dijkstra"],
-            ["prim", "Red Prim"],
-            ["gira", "Gira"],
-          ] as const
-        ).map(([id, etiqueta]) => (
-          <button
-            key={id}
-            type="button"
-            className={capa === id ? "tab activa" : "tab"}
-            onClick={() => setCapa(id)}
-          >
-            {etiqueta}
+    <div className="app">
+      <header className="topbar">
+        <div className="marca">UABC Rutas</div>
+        <nav>
+          <button type="button" className={vista === "mapa" ? "nav-btn activa" : "nav-btn"} onClick={() => setVista("mapa")}>
+            Mapa
           </button>
-        ))}
-      </nav>
-      {capa === "dijkstra" && rutas ? (
-        <div className="toolbar">
-          <label>
-            Pedido{" "}
-            <select
-              value={idPedidoRuta ?? ""}
-              onChange={(e) => setIdPedidoRuta(Number(e.target.value))}
-            >
-              {rutas.rutas.map((r) => (
-                <option key={r.id_pedido} value={r.id_pedido}>
-                  #{r.id_pedido} {r.alcanzable ? `${r.distancia_m?.toFixed(0)} m` : "inalcanzable"}
-                </option>
-              ))}
-            </select>
-          </label>
-          <span className="hint">Exacto (Dijkstra). Solo trayecto almacén → destino.</span>
-        </div>
-      ) : null}
-      {capa === "prim" && mst ? (
-        <div className="toolbar">
-          <span className="hint">
-            Prim, {mst.peso_total_m.toFixed(1)} m. {mst.nota}. Exacto: {mst.exact ? "sí" : "no"}.
-          </span>
-        </div>
-      ) : null}
-      {capa === "gira" && secuencia ? (
-        <div className="toolbar">
-          <span className="hint">
-            {secuencia.exact ? "Backtracking exacto" : `Heurística ${secuencia.heuristic ?? ""}`} ·{" "}
-            {secuencia.distancia_total_m.toFixed(1)} m · nodos explorados {secuencia.nodos_explorados}
-            {secuencia.inalcanzables.length > 0
-              ? ` · inalcanzables: ${secuencia.inalcanzables.join(", ")}`
-              : ""}
-          </span>
-        </div>
-      ) : null}
-      {error ? <p className="error">{error}</p> : null}
-      {mapa ? (
-        <VistaMapa
-          mapa={mapa}
-          pedidos={pedidos}
-          capa={capa}
-          rutaDijkstra={capa === "dijkstra" ? rutaElegida : null}
-          redMinima={mst}
-          secuencia={secuencia}
-        />
+          <button
+            type="button"
+            className={vista === "benchmark" ? "nav-btn activa" : "nav-btn"}
+            onClick={() => setVista("benchmark")}
+          >
+            Benchmark
+          </button>
+        </nav>
+        <button type="button" className="nav-btn" onClick={() => void cargar()}>
+          Recargar
+        </button>
+      </header>
+
+      {vista === "mapa" ? (
+        <>
+          <div className="subheader">
+            <h1>{titulos[foco]}</h1>
+            <span className="zona">UABC Otay · OpenStreetMap</span>
+          </div>
+          {error ? <p className="error">{error}</p> : null}
+          <div className="cuerpo">
+            <div className="mapa-wrap">
+              {mapa ? (
+                <VistaMapa
+                  mapa={mapa}
+                  pedidos={pedidos}
+                  capas={capas}
+                  rutaDijkstra={capas.dijkstra ? rutaElegida : null}
+                  redMinima={mst}
+                  secuencia={secuencia}
+                />
+              ) : (
+                <p className="cargando">Cargando mapa…</p>
+              )}
+              <aside className="tarjeta">
+                <h2>Capas en el mapa</h2>
+                <p className="mini">El cuadro muestra u oculta en el mapa. El nombre solo cambia la info (no apaga las otras capas).</p>
+                {(
+                  [
+                    ["grafo", "Grafo de calles", true],
+                    ["dijkstra", "Dijkstra (un pedido)", Boolean(rutas)],
+                    ["prim", "Red mínima Prim", Boolean(mst)],
+                    ["gira", "Gira / backtracking", Boolean(secuencia)],
+                  ] as const
+                ).map(([id, etiqueta, listo]) => (
+                  <div key={id} className={`check-fila ${foco === id ? "foco" : ""}`}>
+                    <input
+                      type="checkbox"
+                      checked={capas[id]}
+                      disabled={!listo}
+                      onChange={() => {
+                        if (!listo) {
+                          return;
+                        }
+                        const encendida = !capas[id];
+                        setCapas((prev) => ({ ...prev, [id]: encendida }));
+                        if (encendida) {
+                          enfocar(id);
+                        }
+                      }}
+                    />
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      className="link-algo"
+                      onClick={() => listo && enfocar(id)}
+                      onKeyDown={(e) => {
+                        if (listo && (e.key === "Enter" || e.key === " ")) {
+                          enfocar(id);
+                        }
+                      }}
+                    >
+                      {etiqueta}
+                      {!listo ? " (falta JSON)" : ""}
+                    </span>
+                  </div>
+                ))}
+                <label className="check-fila">
+                  <input type="checkbox" checked={capas.pedidos} onChange={() => toggleCapa("pedidos")} />
+                  Marcadores de pedidos
+                </label>
+
+                {foco === "dijkstra" && rutas ? (
+                  <div className="bloque">
+                    <h3>Pedido destino</h3>
+                    <select value={idPedidoRuta ?? ""} onChange={(e) => setIdPedidoRuta(Number(e.target.value))}>
+                      {rutas.rutas.map((r) => (
+                        <option key={r.id_pedido} value={r.id_pedido}>
+                          #{r.id_pedido} {r.alcanzable ? `${r.distancia_m?.toFixed(0)} m` : "inalcanzable"}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="info">
+                      Exacto. Solo almacén → un punto. No es la gira del día.
+                    </p>
+                  </div>
+                ) : null}
+                {foco === "prim" && mst ? (
+                  <div className="bloque">
+                    <h3>Información</h3>
+                    <p className="info">
+                      Peso total {mst.peso_total_m.toFixed(0)} m. {mst.nota}. Exacto.
+                    </p>
+                  </div>
+                ) : null}
+                {foco === "gira" && secuencia ? (
+                  <div className="bloque">
+                    <h3>Información</h3>
+                    <p className="info">
+                      {secuencia.exact ? "Backtracking exacto" : `Heurística ${secuencia.heuristic}`} ·{" "}
+                      {secuencia.distancia_total_m.toFixed(0)} m · {secuencia.nodos_explorados} nodos explorados.
+                    </p>
+                  </div>
+                ) : null}
+                {foco === "grafo" ? (
+                  <div className="bloque">
+                    <h3>Información</h3>
+                    <p className="info">Calles ponderadas (metros). Base para Dijkstra y Prim.</p>
+                  </div>
+                ) : null}
+
+                <div className="stats">
+                  <div className="stat">
+                    <strong>{mapa?.nodes.length ?? 0}</strong>
+                    nodos
+                  </div>
+                  <div className="stat">
+                    <strong>{pedidos.length}</strong>
+                    pedidos
+                  </div>
+                  <div className="stat verde">
+                    <strong>{rutaElegida?.alcanzable || secuencia?.exact ? "Exacto" : "—"}</strong>
+                    etiqueta
+                  </div>
+                </div>
+              </aside>
+            </div>
+            <section className="panel-der">
+              {foco === "gira" && secuencia ? (
+                <>
+                  <h2>Paradas de la gira</h2>
+                  <ol className="paradas">
+                    {secuencia.paradas.map((p) => (
+                      <li key={p.id_pedido}>
+                        Pedido {p.id_pedido}
+                        <span>nodo {p.nodo_destino}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </>
+              ) : (
+                <>
+                  <h2>Pedidos</h2>
+                  <p className="mini">Clic en una fila para ver Dijkstra a ese destino.</p>
+                  <TablaPedidos
+                    pedidos={pedidos}
+                    pedidoActivo={idPedidoRuta}
+                    onSeleccionar={(id) => {
+                      setIdPedidoRuta(id);
+                      enfocar("dijkstra");
+                      setCapas((prev) => ({ ...prev, dijkstra: true }));
+                    }}
+                  />
+                </>
+              )}
+            </section>
+          </div>
+        </>
       ) : (
-        <p>Cargando mapa…</p>
+        <TablaBenchmark datos={bench} />
       )}
-      <TablaPedidos pedidos={pedidos} recargar={() => void cargar()} />
-      {capa === "gira" && secuencia ? (
-        <section className="panel">
-          <h2>Paradas de la gira</h2>
-          <ol>
-            {secuencia.paradas.map((p) => (
-              <li key={p.id_pedido}>
-                Pedido {p.id_pedido} → nodo {p.nodo_destino}
-              </li>
-            ))}
-          </ol>
-        </section>
-      ) : null}
-      <TablaBenchmark datos={bench} />
     </div>
   );
 }

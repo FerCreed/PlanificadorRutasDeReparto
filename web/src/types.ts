@@ -94,4 +94,12 @@ export type BenchmarkSort = {
   filas: FilaBenchmark[];
 };
 
-export type CapaMapa = "grafo" | "dijkstra" | "prim" | "gira";
+export type AlgoritmoFoco = "grafo" | "dijkstra" | "prim" | "gira";
+
+export type CapasVisibles = {
+  grafo: boolean;
+  pedidos: boolean;
+  dijkstra: boolean;
+  prim: boolean;
+  gira: boolean;
+};

@@ -14,42 +14,37 @@ function formatearVentana(inicio: number | null, fin: number | null): string {
 
 type Propiedades = {
   pedidos: Pedido[];
-  recargar: () => void;
+  pedidoActivo: number | null;
+  onSeleccionar: (id: number) => void;
 };
 
-export function TablaPedidos({ pedidos, recargar }: Propiedades) {
+export function TablaPedidos({ pedidos, pedidoActivo, onSeleccionar }: Propiedades) {
   return (
-    <section className="panel">
-      <div className="panel-head">
-        <h2>Pedidos</h2>
-        <button type="button" onClick={recargar}>
-          Recargar datos
-        </button>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nodo</th>
-            <th>Peso</th>
-            <th>Prioridad</th>
-            <th>Ventana</th>
-            <th>Dist. almacén (m)</th>
+    <table className="tabla-panel">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Pri.</th>
+          <th>Peso</th>
+          <th>Ventana</th>
+          <th>Dist. (m)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {pedidos.map((pedido) => (
+          <tr
+            key={pedido.id_pedido}
+            className={pedido.id_pedido === pedidoActivo ? "fila-activa" : ""}
+            onClick={() => onSeleccionar(pedido.id_pedido)}
+          >
+            <td>{pedido.id_pedido}</td>
+            <td>{pedido.prioridad}</td>
+            <td>{pedido.peso_paquete.toFixed(1)}</td>
+            <td>{formatearVentana(pedido.ventana_inicio, pedido.ventana_fin)}</td>
+            <td>{Number.isFinite(pedido.distancia_al_almacen) ? pedido.distancia_al_almacen.toFixed(0) : "—"}</td>
           </tr>
-        </thead>
-        <tbody>
-          {pedidos.map((pedido) => (
-            <tr key={pedido.id_pedido}>
-              <td>{pedido.id_pedido}</td>
-              <td>{pedido.nodo_destino}</td>
-              <td>{pedido.peso_paquete.toFixed(2)}</td>
-              <td>{pedido.prioridad}</td>
-              <td>{formatearVentana(pedido.ventana_inicio, pedido.ventana_fin)}</td>
-              <td>{pedido.distancia_al_almacen.toFixed(1)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </section>
+        ))}
+      </tbody>
+    </table>
   );
 }
